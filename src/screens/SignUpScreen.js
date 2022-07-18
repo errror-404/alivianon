@@ -12,6 +12,7 @@ import {
   Text,
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+import { BaseApiUrl } from "../api/BaseApiUrl";
 
 const SignUpScreen = () => {
   //hook para navegar entre ventanas
@@ -32,7 +33,6 @@ const SignUpScreen = () => {
 
   //funcion para obtener los valores de los inputs
   const handleInputChange = (value, name) => {
-    console.log(value, name);
     setErrorMessage("");
     setAuthCredentials({
       ...authCredentials,
@@ -41,7 +41,7 @@ const SignUpScreen = () => {
   };
 
   //funcion para enviar los datos al servidor
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     //enviar los datos al servidor
 
     //validacion de ingreso de datos
@@ -65,10 +65,26 @@ const SignUpScreen = () => {
       return;
     }
 
-    console.log(authCredentials);
+    await BaseApiUrl.post("createUser", {
+      email: authCredentials.correo,
+      password: authCredentials.password,
+      name: authCredentials.nombre,
+      lastName: authCredentials.apellidos,
+      phoneNumber: authCredentials.telefono,
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.data.error) {
+          setErrorMessage(response.data.message);
+        } else {
+          navigation.navigate("Login");
+        }
+      })
+      .catch((error) => {
+        console.log(error, " errorll");
+      });
 
-    //redireccionar a la pantalla principal
-    //si no, mostrar un mensaje de error
+    // console.log(authCredentials);
   };
 
   return (

@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,6 +13,8 @@ import {
   Text,
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+import { BaseApiUrl } from "../api/BaseApiUrl";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = () => {
   //hook para navegar entre ventanas
@@ -28,25 +30,54 @@ const LoginScreen = () => {
   });
 
   //funcion para obtener los valores de los inputs
-  const handleInputChange = (event) => {
-    setErrorMessage("");
-    const { name, value } = event.target;
+  const handleInputChange = (value, name) => {
     setAuthCredentials({
+      ...authCredentials,
       [name]: value,
     });
   };
 
   //funcion para enviar los datos al servidor
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     //enviar los datos al servidor
     //validacion de ingreso de datos
     if (authCredentials.email === "" && authCredentials.password === "") {
       setErrorMessage("Ingrese un correo y contraseña");
+      return;
     }
+
+    await BaseApiUrl.post("login", {
+      email: authCredentials.email,
+      password: authCredentials.password,
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.data === "") {
+          setErrorMessage("Usuario o contraseña incorrectos");
+        } else {
+          AsyncStorage.setItem("loggedIn", "true");
+          navigation.navigate("MainScreen");
+        }
+      })
+      .catch((error) => {
+        console.log(error, " error");
+      });
+
+    // navigation.navigate("MainScreen");
 
     //redireccionar a la pantalla principal
     //si no, mostrar un mensaje de error
   };
+
+  //Revisar si el usuario esta autenticado
+  useEffect(() => {
+    AsyncStorage.getItem("loggedIn").then((value) => {
+      console.log(value);
+      if (value === "true") {
+        navigation.navigate("MainScreen");
+      }
+    });
+  }, []);
 
   return (
     <Center w="100%" bg={"#fff"} flex={1}>
@@ -76,11 +107,17 @@ const LoginScreen = () => {
         <VStack space={3} mt="5">
           <FormControl>
             <FormControl.Label>Correo electronico</FormControl.Label>
-            <Input type="text" onChange={(e) => handleInputChange(e)} />
+            <Input
+              type="text"
+              onChangeText={(value) => handleInputChange(value, "email")}
+            />
           </FormControl>
           <FormControl>
             <FormControl.Label>Contraseña</FormControl.Label>
-            <Input type="password" onChange={(e) => handleInputChange(e)} />
+            <Input
+              type="password"
+              onChangeText={(value) => handleInputChange(value, "password")}
+            />
             <Link
               _text={{
                 fontSize: "xs",
