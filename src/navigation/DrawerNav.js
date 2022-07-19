@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import BasketDetails from "../screens/BasketDetails";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { Text } from "native-base";
+import PaymentScreen from "../screens/PaymentScreen";
 
 function NotificationsScreen({ navigation }) {
   return (
@@ -72,7 +73,6 @@ const DrawerNav = () => {
 const VendorStack = createStackNavigator();
 
 const VendorsNav = () => {
-  // const navigation = useNavigation();
   return (
     <VendorStack.Navigator>
       <VendorStack.Screen
@@ -85,9 +85,9 @@ const VendorsNav = () => {
       <VendorStack.Screen
         name="Canasta"
         component={BasketDetails}
-        options={() => ({
+        options={({ navigation }) => ({
           headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.navigate("CheckOut")}>
+            <TouchableOpacity onPress={() => navigation.navigate("Pagar")}>
               <Text
                 style={{
                   fontSize: 16,
@@ -102,7 +102,7 @@ const VendorsNav = () => {
           ),
         })}
       />
-      <VendorStack.Screen name="CheckOut" component={DishDetailedScreen} />
+      <VendorStack.Screen name="Pagar" component={PaymentScreen} />
     </VendorStack.Navigator>
   );
 };
