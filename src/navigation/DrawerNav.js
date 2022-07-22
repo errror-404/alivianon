@@ -7,11 +7,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import DishDetailedScreen from "../screens/DishDetailedScreen";
 import CustomSidebarMenu from "../components/CustomSidebarMenu";
 import { Ionicons } from "@expo/vector-icons";
-import BasketDetails from "../screens/BasketDetails";
+import BasketDetails from "../screens/BasketDetailsScreen";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { Text } from "native-base";
 import PaymentScreen from "../screens/PaymentScreen";
-
+import DeliveryScreen from "../screens/DeliveryScreen";
 function NotificationsScreen({ navigation }) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -103,6 +103,7 @@ const VendorsNav = () => {
         })}
       />
       <VendorStack.Screen name="Pagar" component={PaymentScreen} />
+      <VendorStack.Screen name="Entrega" component={DeliveryScreen} />
     </VendorStack.Navigator>
   );
 };

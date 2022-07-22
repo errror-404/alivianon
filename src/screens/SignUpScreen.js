@@ -10,9 +10,11 @@ import {
   Link,
   VStack,
   Text,
+  Select,
 } from "native-base";
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiUrl } from "../api/BaseApiUrl";
+import Escuelas from "../data/escuelas";
 
 const SignUpScreen = () => {
   //hook para navegar entre ventanas
@@ -111,39 +113,56 @@ const SignUpScreen = () => {
         >
           Registrate para continuar!
         </Heading>
-        <VStack space={2} mb="8" mt={"3"}>
-          <FormControl>
+        <VStack space={2} mb="10" mt={"1"}>
+          <FormControl isRequired>
             <FormControl.Label>Nombre</FormControl.Label>
             <Input
               onChangeText={(value) => handleInputChange(value, "nombre")}
             />
+            <FormControl.ErrorMessage>
+              Try different from previous passwords.
+            </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormControl.Label>Apellidos</FormControl.Label>
             <Input
               onChangeText={(value) => handleInputChange(value, "apellidos")}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormControl.Label>Correo electronico</FormControl.Label>
             <Input
               onChangeText={(value) => handleInputChange(value, "correo")}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
+            <FormControl.Label>Selecciona tu escuela</FormControl.Label>
+            <Select
+              onChangeText={(value) => handleInputChange(value, "escuela")}
+            >
+              {Escuelas.map((escuela) => (
+                <Select.Item
+                  key={escuela.universidad_id}
+                  label={escuela.universidad_nombre}
+                  value={escuela.universidad_id}
+                />
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl isRequired>
             <FormControl.Label>Telefono</FormControl.Label>
             <Input
               onChangeText={(value) => handleInputChange(value, "telefono")}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormControl.Label>Contraseña</FormControl.Label>
             <Input
               type="password"
               onChangeText={(value) => handleInputChange(value, "password")}
             />
           </FormControl>
-          <FormControl>
+          <FormControl isRequired>
             <FormControl.Label>Confirmar Contraseña</FormControl.Label>
             <Input
               type="password"

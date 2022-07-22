@@ -7,7 +7,7 @@ const DishListItem = ({ dish, vendedor }) => {
   return (
     <Pressable
       onPress={() =>
-        navigation.navigate("articulo", { articulo: dish, vendedor })
+        navigation.navigate("Articulo", { articulo: dish, vendedor })
       }
       style={styles.container}
     >

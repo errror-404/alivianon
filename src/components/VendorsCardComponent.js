@@ -8,7 +8,7 @@ const VendorsCardComponent = ({ vendor }) => {
   const navigation = useNavigation();
 
   const onPress = () => {
-    navigation.navigate("vendedor", { id: vendor.id });
+    navigation.navigate("Vendedor", { id: vendor.id });
   };
 
   return (
