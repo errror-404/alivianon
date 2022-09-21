@@ -11,15 +11,18 @@ const DishListItem = ({ dish, vendedor }) => {
       }
       style={styles.container}
     >
-      <View style={{ flex: 1 }}>
-        <Text style={styles.name}>{dish.name}</Text>
+      <View style={{ flex: 1, padding: 10 }}>
+        <Text style={styles.name}>{dish.nombre.toUpperCase()}</Text>
         <Text style={styles.description} numberOfLines={2}>
-          {dish.description}
+          {dish.descripcion}
         </Text>
-        <Text style={styles.price}>$ {dish.price}</Text>
+        <Text style={styles.price}>$ {dish.precio}</Text>
       </View>
-      {dish.image && (
-        <Image source={{ uri: dish.image }} style={styles.image} />
+      {dish.imagen && (
+        <Image
+          source={{ uri: `data:image/gif;base64,${dish.imagen}` }}
+          style={styles.image}
+        />
       )}
     </Pressable>
   );
@@ -29,10 +32,12 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
     marginVertical: 10,
-    marginHorizontal: 20,
+    marginHorizontal: 10,
     borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 10,
   },
   name: {
     fontWeight: "600",
@@ -41,14 +46,16 @@ const styles = StyleSheet.create({
   },
   description: {
     color: "gray",
-    marginVertical: 5,
+    marginVertical: 10,
   },
   price: {
     fontSize: 16,
   },
   image: {
-    height: 75,
+    height: 100,
     aspectRatio: 1,
+    padding: 10,
+    marginRight: 10,
   },
 });
 

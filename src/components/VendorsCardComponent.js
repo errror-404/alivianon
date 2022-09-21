@@ -8,24 +8,24 @@ const VendorsCardComponent = ({ vendor }) => {
   const navigation = useNavigation();
 
   const onPress = () => {
-    navigation.navigate("Vendedor", { id: vendor.id });
+    navigation.navigate("Vendedor", { id: vendor._id, vendor });
   };
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
       <Image
         source={{
-          uri: vendor.image.startsWith("http") ? vendor.image : DEFAULT_IMAGE,
+          uri: `data:image/gif;base64,${vendor?.imagen}`,
         }}
         style={styles.image}
       />
 
       <View style={styles.contentContainer}>
-        <Text style={styles.name}>{vendor.name}</Text>
+        <Text style={styles.name}>{vendor.alias}</Text>
         {/* <Text style={styles.description} numberOfLines={2}>
           {dish.description}
         </Text> */}
-        <Text style={styles.rating}>&#11088; {vendor.rating}</Text>
+        {/* <Text style={styles.rating}>&#11088; {vendor.rating}</Text> */}
       </View>
     </Pressable>
   );

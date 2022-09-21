@@ -1,24 +1,44 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import Vendedores from "../data/vendedores.json";
 import VendorDetailedHeader from "../components/VendorDetailedHeader";
 import DishListItem from "../components/DishListItem";
+import { ArticulosApiUrl } from "../api/BaseApiUrl";
+import { Spinner } from "native-base";
 
 const VendorsScreen = () => {
+  const [articulos, setArticulos] = useState(null);
   const route = useRoute();
-  const { id } = route.params;
-  const vendor = Vendedores.find((vendor) => vendor.id === id);
+  const { id, vendor } = route.params;
+
+  useEffect(() => {
+    ArticulosApiUrl.get(`getArticulosByVendedor${id}`).then((response) => {
+      //articulos que no estan desactivados
+      const articulos = response.data.filter((articulo) => {
+        return articulo.activado === "true";
+      });
+      setArticulos(articulos);
+    });
+  }, [id]);
+
+  if (!articulos) {
+    return (
+      <View style={styles.container}>
+        <Spinner size={"lg"}></Spinner>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.page}>
       <FlatList
         ListHeaderComponent={() => <VendorDetailedHeader restaurant={vendor} />}
-        data={vendor.dishes}
+        data={articulos}
         renderItem={({ item }) => (
-          <DishListItem dish={item} vendedor={vendor.name} />
+          <DishListItem dish={item} vendedor={vendor} />
         )}
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item._id}
       />
     </View>
   );

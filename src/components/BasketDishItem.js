@@ -1,15 +1,20 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Image } from "react-native";
 import React from "react";
-import { Image } from "native-base";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { handleRemoveFromBasket } from "../redux/actions/BasketAction";
+import { useDispatch } from "react-redux";
 
-const BasketDishItem = () => {
+const BasketDishItem = ({ dish, isOrder }) => {
+  const dispatch = useDispatch();
+
+  const handleDelete = () => {
+    dispatch(handleRemoveFromBasket(dish));
+  };
+
   return (
     <View style={styles.row}>
       <Image
-        source={{
-          uri: "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/uber-eats/restaurant3.jpeg",
-        }}
+        source={{ uri: `data:image/gif;base64,${dish.imagen}` }}
         style={styles.image}
       />
       <View
@@ -20,21 +25,22 @@ const BasketDishItem = () => {
         }}
       >
         <Text style={{ fontWeight: "600", color: "#475223" }}>
-          Hamburger La Super Cabo Burger
+          {dish?.name.toUpperCase()}
         </Text>
-        <Text style={styles.description}>
-          Double meat, gouda cheese, cheddar cheese, cooked ham, bacon, egg,
-          salad and rustic potatoes.
-        </Text>
+        <Text style={styles.description}>{dish?.descripcion}</Text>
         <View style={{ flexDirection: "row" }}>
           <Ionicons name="pricetag-outline" size={20} color="green" />
-          <Text style={{ color: "#E6C585", marginHorizontal: 5 }}>$8.99</Text>
-          <Text style={{ color: "white" }}>cantidad: 3</Text>
+          <Text style={{ color: "#E6C585", marginHorizontal: 5 }}>
+            ${dish?.price}
+          </Text>
+          <Text style={{ color: "black" }}>cantidad: {dish?.quantity}</Text>
         </View>
       </View>
-      <TouchableOpacity>
-        <AntDesign name="delete" size={24} color="red" />
-      </TouchableOpacity>
+      {isOrder ? null : (
+        <TouchableOpacity onPress={handleDelete}>
+          <AntDesign name="delete" size={24} color="red" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

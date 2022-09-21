@@ -1,8 +1,16 @@
-import { Dimensions, StyleSheet, Text, View } from "react-native";
-import React, { useEffect } from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import Carousel from "react-native-reanimated-carousel";
-import { Image } from "native-base";
+import { Image, Spinner } from "native-base";
 import { useNavigation } from "@react-navigation/native";
+
+import { useSelector } from "react-redux";
 
 const CarouselCard = ({ item }) => {
   return (
@@ -16,12 +24,8 @@ const CarouselCard = ({ item }) => {
   );
 };
 
-const VendorsHeader = () => {
+const VendorsHeader = ({ pedido }) => {
   const navigation = useNavigation();
-
-  useEffect(() => {
-    // reset navigationStack
-  }, []);
 
   const window = Dimensions.get("window").width;
   return (
@@ -33,6 +37,36 @@ const VendorsHeader = () => {
         margin: 10,
       }}
     >
+      {pedido.estado === "NUEVO" || pedido.estado === "EN_CAMINO" ? (
+        <TouchableOpacity
+          style={{
+            backgroundColor: "white",
+            flex: 1,
+            width: "100%",
+            borderRadius: 10,
+          }}
+          onPress={() =>
+            navigation.navigate("Entrega", {
+              pedido: pedido,
+            })
+          }
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+              alignItems: "center",
+              padding: 10,
+            }}
+          >
+            <Text style={{ fontSize: 17, textAlign: "center" }}>
+              Tienes un pedido activo
+            </Text>
+            <Spinner size={"lg"}></Spinner>
+          </View>
+        </TouchableOpacity>
+      ) : null}
+
       <Carousel
         autoPlay={true}
         autoPlayInterval={6000}

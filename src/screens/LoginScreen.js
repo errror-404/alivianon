@@ -15,8 +15,12 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { BaseApiUrl } from "../api/BaseApiUrl";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch } from "react-redux";
+import { handleLogin } from "../redux/actions/AuthAction";
 
 const LoginScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   //hook para navegar entre ventanas
   const navigation = useNavigation();
 
@@ -39,29 +43,37 @@ const LoginScreen = () => {
 
   //funcion para enviar los datos al servidor
   const handleSubmit = async () => {
+    setIsLoading(true);
     //enviar los datos al servidor
     //validacion de ingreso de datos
     if (authCredentials.email === "" && authCredentials.password === "") {
       setErrorMessage("Ingrese un correo y contraseña");
+      setIsLoading(false);
+
       return;
     }
 
     await BaseApiUrl.post("login", {
       email: authCredentials.email,
       password: authCredentials.password,
+      role: "user",
     })
-      .then((response) => {
-        console.log(response);
+      .then(async (response) => {
         if (response.data === "") {
+          setIsLoading(false);
+
           setErrorMessage("Usuario o contraseña incorrectos");
         } else {
+          dispatch(await handleLogin(response.data));
           AsyncStorage.setItem("loggedIn", "true");
           navigation.navigate("MainScreen");
         }
       })
       .catch((error) => {
+        setIsLoading(false);
         console.log(error, " error");
       });
+    setIsLoading(false);
 
     // navigation.navigate("MainScreen");
 
@@ -72,7 +84,6 @@ const LoginScreen = () => {
   //Revisar si el usuario esta autenticado
   useEffect(() => {
     AsyncStorage.getItem("loggedIn").then((value) => {
-      console.log(value);
       if (value === "true") {
         navigation.navigate("MainScreen");
       }
@@ -82,34 +93,15 @@ const LoginScreen = () => {
   return (
     <Center w="100%" bg={"#fff"} flex={1}>
       <Box safeArea p="3" w="100%" maxW="390">
-        {/* <Heading
-          size="lg"
-          fontWeight="600"
-          color="coolGray.800"
-          _dark={{
-            color: "warmGray.50",
-          }}
-        >
-          Bienvenido
-        </Heading>
-        <Heading
-          mt="1"
-          _dark={{
-            color: "warmGray.200",
-          }}
-          color="coolGray.600"
-          fontWeight="medium"
-          size="xs"
-        >
-          Inicia sesión para continuar!
-        </Heading> */}
-
         <VStack space={3} mt="5">
           <FormControl>
             <FormControl.Label>Correo electronico</FormControl.Label>
             <Input
+              keyboardType="email-address"
+              autoCapitalize="none"
               type="text"
               onChangeText={(value) => handleInputChange(value, "email")}
+              style={styles.input}
             />
           </FormControl>
           <FormControl>
@@ -117,6 +109,7 @@ const LoginScreen = () => {
             <Input
               type="password"
               onChangeText={(value) => handleInputChange(value, "password")}
+              style={styles.input}
             />
             <Link
               _text={{
@@ -126,6 +119,7 @@ const LoginScreen = () => {
               }}
               alignSelf="flex-end"
               mt="1"
+              onPress={() => navigation.navigate("EmailScreen")}
             >
               ¿Olvidaste tu contraseña?
             </Link>
@@ -133,8 +127,13 @@ const LoginScreen = () => {
           <Text marginY={2} textAlign={"center"} color="red.600">
             {errorMessage}
           </Text>
-          <Button mt="2" colorScheme="indigo" onPress={handleSubmit}>
-            Iniciar sesión
+          <Button
+            mt="2"
+            colorScheme="indigo"
+            onPress={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? "Cargando..." : "Iniciar sesión"}
           </Button>
           <HStack mt="6" justifyContent="center">
             <Text
@@ -165,4 +164,9 @@ const LoginScreen = () => {
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  input: {
+    height: 60,
+    fontSize: 18,
+  },
+});

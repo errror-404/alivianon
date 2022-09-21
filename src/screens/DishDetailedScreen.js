@@ -1,14 +1,22 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
-import vendedores from "../data/vendedores.json";
 import { useRoute } from "@react-navigation/native";
 import { Image } from "native-base";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  handleAddToBasket,
+  handleAddMore,
+} from "../redux/actions/BasketAction";
+import { useNavigation } from "@react-navigation/native";
 
 const DishDetailedScreen = () => {
+  const userID = useSelector((state) => state.user.user._id);
+  const basketItems = useSelector((state) => state.basket.basket);
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
   const route = useRoute();
-  const { articulo, vendedor } = route.params;
-
   const [counter, setCounter] = useState(1);
+  const { articulo, vendedor } = route.params;
 
   const onMinus = () => {
     if (counter > 1) {
@@ -20,16 +28,55 @@ const DishDetailedScreen = () => {
     setCounter(counter + 1);
   };
 
+  const onAddToBasket = async () => {
+    //checkk if the item is already in the basket
+    const item = basketItems.find((item) => item.id === articulo._id);
+    if (item) {
+      dispatch(
+        handleAddMore({
+          id: item.id,
+          quantity: counter,
+        })
+      );
+    } else if (
+      basketItems[0]?.vendedor !== vendedor._id &&
+      basketItems[0] !== undefined
+    ) {
+      alert("No puedes agregar productos de diferentes vendedores");
+    } else {
+      dispatch(
+        handleAddToBasket({
+          user: userID,
+          id: articulo._id,
+          vendedor: vendedor._id,
+          name: articulo.nombre,
+          price: articulo.precio,
+          quantity: counter,
+          imagen: articulo.imagen,
+          descripcion: articulo.descripcion,
+          stripeID: vendedor.stripeCustomerId,
+        })
+      );
+    }
+    navigation.navigate("Inicio");
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <View>
-        <Image alt="" source={{ uri: articulo.image }} style={styles.image} />
+        <Image
+          alt="Articulo"
+          source={{ uri: `data:image/gif;base64,${articulo?.imagen}` }}
+          style={styles.image}
+        />
       </View>
       <View style={{ flex: 1 * 0.8, bottom: 0 }}>
         <View style={styles.textContainer}>
-          <Text style={styles.articuloText}>{articulo.name}</Text>
-          <Text style={styles.vendedorText}>{vendedor}</Text>
-          <Text style={styles.priceText}>${articulo.price}</Text>
+          <Text style={styles.articuloText}>
+            {articulo.nombre.toUpperCase()}
+          </Text>
+          <Text style={styles.vendedorText}>{vendedor.alias}</Text>
+          <Text style={styles.priceText}>${articulo.precio}</Text>
         </View>
       </View>
       <View
@@ -37,7 +84,7 @@ const DishDetailedScreen = () => {
           alignItems: "center",
         }}
       >
-        <Text style={styles.descriptionText}>{articulo.description}</Text>
+        <Text style={styles.descriptionText}>{articulo.descripcion}</Text>
       </View>
       <View
         style={{
@@ -63,7 +110,7 @@ const DishDetailedScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity style={styles.addButton} onPress={onAddToBasket}>
         <Text
           style={{
             color: "white",
